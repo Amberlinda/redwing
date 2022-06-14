@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import TeamWork from 'screens/TeamWork/TeamWork';
 import styles from './BigDashboard.module.css';
 import { TopStatistics } from './TopStatistics';
@@ -11,11 +11,16 @@ import { Link } from 'react-router-dom';
 import HomeMaxIcon from '@mui/icons-material/HomeMax';
 import MinimizeIcon from '@mui/icons-material/Maximize';
 import { motion } from 'framer-motion'
+import { AllDataContext } from '../../context/AllDataContext';
 
 const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
+
+	const { globalState, setGlobalState } = useContext(AllDataContext);
+
 	useEffect(() => {
 		getTeamWorkData();
 		setInterval(async () => getTeamWorkData(), 120000);
+		console.log(globalState)
 	}, []);
 
 	const [totalTickets, setTotalTickets] = useState(0);
@@ -165,10 +170,8 @@ const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 			<Helmet>
 				<meta name="apple-mobile-web-app-capable" content="yes" />
 			</Helmet>
-			{showColumns.activity && 
-			<div 
-			className={`${styles.activity} ${showColumns.project ? "" : styles.expandCol}`}
-			>
+			{(showColumns.activity && (topStatisticsCount.hoursOfWeek > 0)) && 
+			<div className={`${styles.activity} ${showColumns.project ? "" : styles.expandCol}`}>
 				{showColumns.project ? 
 				<HomeMaxIcon style={maxIconStyle} className={styles.maxIcon} onClick={() => maximiseColHandler("activity")}/>
 				:<MinimizeIcon className={styles.minIcon} style={maxIconStyle} onClick={minimizeColHandler}/>}
@@ -186,7 +189,12 @@ const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 					/>
 				</div>
 			</div>}
-			{showColumns.project && <div className={`${styles.project} ${showColumns.teamwork ? "" : styles.expandCol}`}>
+			{showColumns.project && 
+			<div 
+			className={`
+				${styles.project} 
+				${((topStatisticsCount.hoursOfWeek > 0) || !showColumns.teamwork) ? "" : styles.expandProject}
+				${showColumns.teamwork ? "" : styles.expandCol}`}>
 				{showColumns.teamwork ? 
 				<HomeMaxIcon style={maxIconStyle} className={styles.maxIcon} onClick={() => maximiseColHandler("project")}/>
 				:<MinimizeIcon className={styles.minIcon} style={maxIconStyle} onClick={minimizeColHandler}/>}
