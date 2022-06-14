@@ -282,7 +282,7 @@ const TeamWork = ({
 				exit={isInverted ? 'outRight' : 'outLeft'}
 				variants={pageVariants}
 				transition={pageTransitions}
-				style={{ width: '100%', height: '100%'}}
+				style={{ width: '100%', height: '100%',position:"relative"}}
 			>
 				<Container>
 					{showTabComponent && (

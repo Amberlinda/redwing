@@ -8,6 +8,9 @@ import moment from 'moment';
 import axios from 'axios';
 import {Helmet} from "react-helmet";
 import { Link } from 'react-router-dom';
+import HomeMaxIcon from '@mui/icons-material/HomeMax';
+import MinimizeIcon from '@mui/icons-material/Maximize';
+import { motion } from 'framer-motion'
 
 const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 	useEffect(() => {
@@ -17,6 +20,11 @@ const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 
 	const [totalTickets, setTotalTickets] = useState(0);
 	const [completedTask, setCompletedTask] = useState(0);
+	const [showColumns,setShowColumns] = useState({
+		activity:true,
+		project:true,
+		teamwork:true,
+	})
 
 	const localStorageData = localStorage.getItem('redwing_data');
 
@@ -33,6 +41,12 @@ const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 
 	const scrollTop=()=>{
 		window.scrollTo({top:0,behaviour:'smooth'})
+	}
+
+	const maxIconStyle = {
+		fontSize:"25px",
+		transition:"transform 0.5s",
+		cursor:"pointer"
 	}
 
 	useEffect(() => {
@@ -121,12 +135,43 @@ const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 			};
 		});
 	}, [timer]);
+
+	const maximiseColHandler = (type) => {
+		if(!type)return
+
+		const obj = {...showColumns}
+
+		Object.keys(showColumns).forEach((val) => {
+			obj[val] = (val == type) ? true : false
+		})
+
+		setShowColumns(obj)
+	}
+
+	const minimizeColHandler = () => {
+
+		const obj = {...showColumns}
+
+		Object.keys(showColumns).forEach((val) => {
+			obj[val] = true
+		})
+
+		setShowColumns(obj)
+	}
+
+
 	return (
 		<div className={styles.bigdashboard}>
 			<Helmet>
 				<meta name="apple-mobile-web-app-capable" content="yes" />
 			</Helmet>
-			<div className={styles.activity}>
+			{showColumns.activity && 
+			<div 
+			className={`${styles.activity} ${showColumns.project ? "" : styles.expandCol}`}
+			>
+				{showColumns.project ? 
+				<HomeMaxIcon style={maxIconStyle} className={styles.maxIcon} onClick={() => maximiseColHandler("activity")}/>
+				:<MinimizeIcon className={styles.minIcon} style={maxIconStyle} onClick={minimizeColHandler}/>}
 				<div className={styles.outertopStatisticsBar}>
 					<div className={styles.topStatisticsBar}>
 						<TopStatistics text={'Hours of work'} count={topStatisticsCount.hoursOfWeek} />
@@ -140,8 +185,11 @@ const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 						selectedProject={selectedProject}
 					/>
 				</div>
-			</div>
-			<div className={styles.project}>
+			</div>}
+			{showColumns.project && <div className={`${styles.project} ${showColumns.teamwork ? "" : styles.expandCol}`}>
+				{showColumns.teamwork ? 
+				<HomeMaxIcon style={maxIconStyle} className={styles.maxIcon} onClick={() => maximiseColHandler("project")}/>
+				:<MinimizeIcon className={styles.minIcon} style={maxIconStyle} onClick={minimizeColHandler}/>}
 				<div className={styles.outertopStatisticsBar}>
 					<div className={styles.topStatisticsBar}>
 						<TopStatistics text={'Worth Orders'} count={topStatisticsCount.worthOrders} />
@@ -150,8 +198,11 @@ const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 				<div className={styles.alignProjectsContent}>
 					<ProjectsColumn setTopStatisticsCount={setTopStatisticsCount} />
 				</div>
-			</div>
-			<div className={styles.teamWork}>
+			</div>}
+			{showColumns.teamwork && <div className={`${styles.teamWork} ${showColumns.project ? "" : styles.expandCol}`}>
+				{showColumns.project ? 
+				<HomeMaxIcon style={maxIconStyle} className={styles.maxIcon} onClick={() => maximiseColHandler("teamwork")}/>
+				:<MinimizeIcon className={styles.minIcon} style={maxIconStyle} onClick={minimizeColHandler}/>}
 				<div className={styles.outertopStatisticsBar}>
 					<div className={styles.topStatisticsBar}>
 						<TopStatistics text={'Tasks Today'} count={topStatisticsCount.tasksToday} />
@@ -168,7 +219,7 @@ const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 						showActionButtons={false}
 					/>
 				</div>
-			</div>
+			</div>}
 			<div className="big-dashboard-footer" style={{margin:"1rem"}}>
 				<Link to='/homepage'onClick={scrollTop}>Go to Homepage</Link>
 			</div>
