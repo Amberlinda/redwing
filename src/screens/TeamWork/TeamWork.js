@@ -282,7 +282,7 @@ const TeamWork = ({
 				exit={isInverted ? 'outRight' : 'outLeft'}
 				variants={pageVariants}
 				transition={pageTransitions}
-				style={{ width: '100%', height: '100%'}}
+				style={{ width: '100%', height: '100%',position:"relative"}}
 			>
 				<Container>
 					{showTabComponent && (
@@ -699,7 +699,7 @@ const TableRow = props => {
 		}
 	}
 	const getProjectCount=(projectid,userid)=>{
-		console.log(props.data);
+		// console.log(props.data);
 		for(let i=0;i<props.data.length;i++){
 			if(props.data[i].user_id===userid){
 				return props.data[i]?.projects[projectid]?.count;
@@ -754,8 +754,8 @@ const TableRow = props => {
         delay: 500,
     };
 	const longPressAvatarEvent = useLongPress(onAvatarLongPress, onAvatarClick, defaultOptions)
-	console.log(parseInt(props.active.split('(')[0])-props.completed_todo)
-	console.log(props.active)
+	// console.log(parseInt(props.active.split('(')[0])-props.completed_todo)
+	// console.log(props.active)
 	return (
 		<tr style={{ marginTop: '0', paddingTop: '0' }}>
 			<td style={{ fontSize: '14px' }}>
