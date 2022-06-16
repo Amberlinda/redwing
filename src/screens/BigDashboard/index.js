@@ -30,6 +30,9 @@ const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 		project:true,
 		teamwork:true,
 	})
+	const [slowdowns,setSlowdowns] = useState(["Suraj","Aditya","Omkar"])
+	const [absentees,setAbsentees] = useState(["Anand","Anurag"])
+	const [idles,setIdles] = useState(["Mohd","Sakil"])
 
 	const localStorageData = localStorage.getItem('redwing_data');
 
@@ -216,6 +219,7 @@ const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 						<TopStatistics text={'Tasks Today'} count={topStatisticsCount.tasksToday} />
 						<TopStatistics text={'Team Load'} count={totalTickets} />
 						<TopStatistics text={'Completions'} count={completedTask} />
+						<TopStatistics text={'Sleeping tasks'} count={data.sleeping_tasks} link="https://redwing.puneetpugalia.com/pages/sleeping_task.php"/>
 					</div>
 				</div>
 				<div className={styles.alignTeamContent}>
@@ -227,6 +231,7 @@ const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 						showActionButtons={false}
 					/>
 				</div>
+
 			</div>}
 			<div className="big-dashboard-footer" style={{margin:"1rem"}}>
 				<Link to='/homepage'onClick={scrollTop}>Go to Homepage</Link>

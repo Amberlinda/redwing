@@ -31,4 +31,11 @@
   .projectCount:hover {
       text-decoration: underline;
   }
-
+  .statisticsBottomCont{
+    color: #fff;
+    margin-top: 20px;
+  }
+  
+  .statisticsBottomCont > div{
+    margin-bottom: 5px;
+  }
