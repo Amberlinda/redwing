@@ -12,6 +12,7 @@ import HomeMaxIcon from '@mui/icons-material/HomeMax';
 import MinimizeIcon from '@mui/icons-material/Maximize';
 import { motion } from 'framer-motion'
 import { AllDataContext } from '../../context/AllDataContext';
+import TeamWorkSegmenting from '../TeamWork/TeamWorkSegmenting'
 
 const BigDashboard = ({ selectedProject, setSelectedProject, timer }) => {
 

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import './TeamWork.css';
 import { motion } from 'framer-motion';
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { pageTransitions, pageVariants } from 'animations';
 import { Container, TeamTabBottom, TeamTabTop, ModalBody, Projects } from './Style';
 import { Button, Container as MdContainer, Grid, Modal, Box,CardMedia, Card, CardContent, TextField } from '@material-ui/core';
@@ -10,14 +10,14 @@ import { Typography } from '@material-ui/core';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import TabComponent from 'components/TabComponent/TabComponent';
 import moment from 'moment';
 import useLongPress from '../../hooks/useLongPress'
 import { alertClasses } from '@mui/material';
 import BottomStatistics from './BottomStatistics'
 import TableRow from './TableRow'
+import TeamWorkSegmenting from './TeamWorkSegmenting'
+import TeamWorkTable from './TeamWorkTable';
 
 const token = localStorage.getItem('red_wing_token');
 const token_expiry_date = localStorage.getItem('red_wing_token_expiry_date');
@@ -62,82 +62,18 @@ const TeamWork = ({
 	const [openAddProjectModal, setOpenAddProjectModal] = useState(false);
 	const classes = useStyles();
 	const [loading, setLoading] = useState(false);
-	const [sortingOrder, setSortingOrder] = useState('DEC');
-	const [sortingColumn, setSortingColumn] = useState('tasks_count');
 	const [openDeleteModal,setOpenDeleteModal]=useState(false);
 	const [deleteMember,setDeleteMember] = useState({img:'',name:'', user_id:''})
 	const [exceptionNameList,setExceptionNameList] = useState(["kajal"])
+	const [selectedSegmentation,setSelectedSegmentation] = useState("default")
+	const [usersData,setUsersData] = useState({})
 
 	useEffect(() => {
 		getTeamWorkData();
 		setInterval(async () => getTeamWorkData(), 120000);
 	}, []);
 
-	const sorting = (col, sortingOrder1) => {
-		if (col === 'tasks_count' || col === 'active_count') {
-			if (sortingOrder1 === 'ASC') {
-				const sorted = [...users].sort((a, b) => (a[col] < b[col] ? 1 : -1));
-
-				setUsers(sorted);
-
-				setSortingOrder('DEC');
-			} else if (sortingOrder1 === 'DEC') {
-				const sorted = [...users].sort((a, b) => (a[col] > b[col] ? 1 : -1));
-
-				setUsers(sorted);
-
-				setSortingOrder('ASC');
-			}
-		} else if (col === 'project_ids') {
-			if (sortingOrder1 === 'ASC') {
-				const sorted = [...users].sort((a, b) => (a[col].length < b[col].length ? 1 : -1));
-
-				setUsers(sorted);
-
-				setSortingOrder('DEC');
-			} else if (sortingOrder1 === 'DEC') {
-				const sorted = [...users].sort((a, b) => (a[col].length > b[col].length ? 1 : -1));
-
-				setUsers(sorted);
-
-				setSortingOrder('ASC');
-			}
-		} else if (col === 'name') {
-			if (sortingOrder1 === 'ASC') {
-				const sorted = [...users].sort((a, b) =>
-					a[col].toLowerCase() < b[col].toLowerCase() ? 1 : -1
-				);
-
-				setUsers(sorted);
-
-				setSortingOrder('DEC');
-			} else if (sortingOrder1 === 'DEC') {
-				const sorted = [...users].sort((a, b) =>
-					a[col].toLowerCase() > b[col].toLowerCase() ? 1 : -1
-				);
-
-				setUsers(sorted);
-
-				setSortingOrder('ASC');
-			}
-		}else if (col === 'completed_todo') {
-			if (sortingOrder1 === 'ASC') {
-				const sorted = [...users].sort((a, b) => (a[col] < b[col] ? 1 : -1));
-
-				setUsers(sorted);
-
-				setSortingOrder('DEC');
-			} else if (sortingOrder1 === 'DEC') {
-				const sorted = [...users].sort((a, b) => (a[col] > b[col] ? 1 : -1));
-
-				setUsers(sorted);
-
-				setSortingOrder('ASC');
-			}
-		}
-		//(sortingOrder);
-	};
-
+	
 	const getTeamWorkData = () => {
 		// setLoading(true);
 		axios
@@ -190,8 +126,8 @@ const TeamWork = ({
 			// 	users.push(data.users[k]);
 			// }
 			setUsers(users);
-			setSortingOrder('DEC');
-			setSortingColumn('tasks_count');
+			// setSortingOrder('DEC');
+			// setSortingColumn('tasks_count');
 		}
 	}, [data]);
 
@@ -318,8 +254,45 @@ const TeamWork = ({
 			</div>
 		)
 	}
+
+	const segmentationHandler = (option) => {
+		if(!option)return
+
+		console.log(users)
+
+		switch(option){
+			case "playground":
+				const newUsersData = {
+					"redwing":[],
+					"client project":[]
+				}
+				users.forEach(elem => {
+					if(elem.project_ids.indexOf(23190856) !== -1){
+						if(elem.project_ids.length === 1){
+							newUsersData.redwing.push(elem)
+						}else{
+							newUsersData.redwing.push(elem)
+							newUsersData['client project'].push(elem)
+						}
+					}else{
+						newUsersData['client project'].push(elem);
+					}
+				})
+				
+				setUsersData(newUsersData) 
+				break;
+			case "project":
+				break;
+			case "performance":
+				break;
+			default:
+				setUsersData(users)
+		}
+	}
 	
-	
+	useEffect(() => {
+		segmentationHandler(selectedSegmentation)
+	},[selectedSegmentation])
 
 	return (
 		<>
@@ -378,192 +351,37 @@ const TeamWork = ({
 									</table>
 								</TeamTabTop>
 							)}
+							<TeamWorkSegmenting 
+								selectedSegmentation={selectedSegmentation}
+								setSelectedSegmentation={setSelectedSegmentation}
+							/>
 							<TeamTabBottom>
-								<table cellspacing="0" cellpadding="0">
-									<thead>
-										<tr>
-											<th
-												onClick={e => {
-													e.preventDefault();
-													setSortingColumn('name');
-													if (sortingOrder === 'ASC') {
-														sorting('name', 'ASC');
-													} else {
-														sorting('name', 'DEC');
-													}
-												}}
-												style={{
-													transform: 'translateX(-6px)',
-													fontSize: '14px',
-													lineHeight: '21px',
-													fontFamily: 'Poppins',
-													fontWeight: '500',
-													width: '1%',
-													'white-space': 'nowrap',
-													cursor:"pointer"
-												}}
-											>
-												{users.length} Team Members
-												{sortingColumn === 'name' ? (
-													<a href='/' style={{ color: 'white', marginLeft: '2px' }}>
-														{sortingOrder === 'ASC' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
-													</a>
-												) : (
-													''
-												)}
-											</th>
-
-											<th
-												onClick={(e) => {
-													e.preventDefault();
-													setSortingColumn('completed_todo');
-													if (sortingOrder === 'ASC') {
-														sorting('completed_todo', 'ASC');
-													} else {
-														sorting('completed_todo', 'DEC');
-													}
-												}}
-												style={{
-													textAlign: 'left',
-													position:'relative',
-													right:"-30px",
-													paddingRight: '5rem',
-													fontSize: '14px',
-													lineHeight: '21px',
-													fontFamily: 'Poppins',
-													fontWeight: '500',
-													width: 'max-content',
-													cursor:"pointer"
-												}}
-											>
-												Activity
-												{sortingColumn === 'completed_todo' ? (
-													<a style={{ color: 'white', marginLeft: '2px' }} href='/'>
-														{sortingOrder === 'ASC' ? <ArrowUpwardIcon style={{position:'relative',top:"2px"}} /> : <ArrowDownwardIcon style={{position:'relative',top:"2px"}} />}
-													</a>
-												) : (
-													''
-												)}{' '}
-											</th>
-
-											<th
-												onClick={e => {
-													e.preventDefault();
-													setSortingColumn('tasks_count');
-													if (sortingOrder === 'ASC') {
-														sorting('tasks_count', 'ASC');
-													} else {
-														sorting('tasks_count', 'DEC');
-													}
-												}}
-												style={{
-													textAlign: 'center',
-													paddingRight: '2%',
-													fontSize: '14px',
-													lineHeight: '21px',
-													fontFamily: 'Poppins',
-													fontWeight: '500',
-													width: '1%',
-													'white-space': 'nowrap',
-													cursor:"pointer"
-												}}
-											>
-												Tasks
-												{sortingColumn === 'tasks_count' ? (
-													<a style={{ color: 'white', marginLeft: '2px' }} href='/'>
-														{sortingOrder === 'ASC' ? <ArrowUpwardIcon style={{position:'relative',top:"2px"}} /> : <ArrowDownwardIcon style={{position:'relative',top:"2px"}} />}
-													</a>
-												) : (
-													''
-												)}{' '}
-											</th>
-											{/* <th
-												onClick={e => {
-													e.preventDefault();
-													setSortingColumn('active_count');
-													if (sortingOrder === 'ASC') {
-														sorting('active_count', 'ASC');
-													} else {
-														sorting('active_count', 'DEC');
-													}
-												}}
-												style={{
-													textAlign: 'center',
-													paddingRight: '1.5rem',
-													fontSize: '14px',
-													lineHeight: '21px',
-													fontFamily: 'Poppins',
-													fontWeight: '500'
-												}}
-											>
-												Comments
-												{sortingColumn === 'active_count' ? (
-													<a style={{ color: 'white', marginLeft: '2px' }} href='/'>
-														{sortingOrder === 'ASC' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
-													</a>
-												) : (
-													''
-												)}
-											</th> */}
-											<th
-												onClick={e => {
-													e.preventDefault();
-													setSortingColumn('project_ids');
-													if (sortingOrder === 'ASC') {
-														sorting('project_ids', 'ASC');
-													} else {
-														sorting('project_ids', 'DEC');
-													}
-												}}
-												style={{
-													textAlign: 'center',
-													// paddingRight: '1.5rem',
-													fontSize: '14px',
-													lineHeight: '21px',
-													fontFamily: 'Poppins',
-													fontWeight: '500',
-													width: '1%',
-													'white-space': 'nowrap',
-													cursor:"pointer"
-												}}
-											>
-												Projects
-												{sortingColumn === 'project_ids' ? (
-													<a style={{ color: 'white', marginLeft: '2px' }} href='/'>
-														{sortingOrder === 'ASC' ? <ArrowUpwardIcon style={{position:'relative',top:"2px"}} /> : <ArrowDownwardIcon style={{position:'relative',top:"2px"}} />}
-													</a>
-												) : (
-													''
-												)}
-											</th>
-										</tr>
-									</thead>
-									<tbody>
-										{users
-											? users.map((user, key) => {
-												return (
-													<TableRow
-														key={key}
-														img={user.avatar}
-														user_id={user.user_id}
-														tasks={user.tasks_count}
-														name={user.name}
-														active={user.active_count}
-														active_todo={user.active_todo_count}
-														projects={user.project_ids}
-														completed_todo={user.completed_todo}
-														last_active_at={user.last_active_at}
-														projectsdata={projects}
-														data={data.users}
-														getTeamWorkData={getTeamWorkData}	
-														setLoading={setLoading}
-														exceptionNameList={exceptionNameList}				
-													/>
-												);
-											})
-											: ''}
-									</tbody>
-								</table>
+								{
+									selectedSegmentation === "default" ? 
+										<TeamWorkTable
+											userData={users}
+											setLoading={setLoading}
+											data={data}
+											projects={projects}
+											getTeamWorkData={getTeamWorkData}
+											exceptionNameList={exceptionNameList}
+										/>
+									: Object.entries(usersData).map(elem => (
+										<Fragment>
+											<p className='segmentHead'>{elem[0]}</p>
+											<TeamWorkTable
+												key={elem[0]}
+												userData={elem[1]}
+												setLoading={setLoading}
+												data={data}
+												projects={projects}
+												getTeamWorkData={getTeamWorkData}
+												exceptionNameList={exceptionNameList}
+											/>
+										</Fragment>
+									))
+								}
+								
 
 								{bottomStatisticsHandler(users)}
 

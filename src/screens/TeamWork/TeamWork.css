@@ -39,3 +39,34 @@
   .statisticsBottomCont > div{
     margin-bottom: 5px;
   }
+
+  .segmentingCont{
+    color: #fff;
+    padding: 6px;
+    margin-bottom: 6px;
+  }
+
+  .segmentingListCont{
+    list-style: none;
+    display: inline-block;
+    padding-left: 0;
+  }
+
+  .segmentingListCont > li{
+    display: inline-block;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: all 0.5s;
+	text-transform: capitalize;
+  }
+
+  .segmentingListCont > li:hover{
+    font-weight: bold;
+  }
+
+  .segmentHead{
+    color: #fff;
+    text-transform: capitalize;
+    padding: 6px;
+    font-weight: bold;
+  }
