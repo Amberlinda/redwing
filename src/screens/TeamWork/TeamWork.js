@@ -258,11 +258,12 @@ const TeamWork = ({
 	const segmentationHandler = (option) => {
 		if(!option)return
 
+		let newUsersData={}
 		console.log(users)
 
 		switch(option){
 			case "playground":
-				const newUsersData = {
+				newUsersData = {
 					"redwing":[],
 					"client project":[]
 				}
@@ -282,8 +283,55 @@ const TeamWork = ({
 				setUsersData(newUsersData) 
 				break;
 			case "project":
+				newUsersData = {
+					"multitasking":[]
+				}
+				const idleArr = []
+				users.forEach(elem => {
+					if(elem.project_ids.length > 1){
+						newUsersData.multitasking.push(elem)
+					}
+					if(elem.tasks_count === 0){
+						idleArr.push(elem)
+					}
+				})
+				projects.forEach(project => {
+					const projectArr = []
+					users.map(user => {
+						if(user.project_ids.indexOf(project.project_id) !== -1){
+							projectArr.push(user)
+							newUsersData = {
+								...newUsersData,
+								[project.name]:projectArr
+							}
+						}
+					})
+				})
+				newUsersData = {
+					...newUsersData,
+					"idle":idleArr
+				}
+				setUsersData(newUsersData)
 				break;
 			case "performance":
+				newUsersData = {
+					"5+ ticks":[],
+					"1-5 ticks":[],
+					"0 ticks":[]
+				}
+				users.forEach(user => {
+					if(user.completed_todo > 5){
+						newUsersData["5+ ticks"].push(user)
+					}else if(user.completed_todo >= 1 && user.completed_todo <= 5){
+						newUsersData["1-5 ticks"].push(user)
+					}else{
+						newUsersData["0 ticks"].push(user)
+					}
+				})
+				for(let obj in newUsersData){
+					newUsersData[obj] = [...newUsersData[obj]].sort((a, b) => (a["completed_todo"] < b["completed_todo"] ? 1 : -1));
+				}
+				setUsersData(newUsersData)
 				break;
 			default:
 				setUsersData(users)
@@ -377,6 +425,7 @@ const TeamWork = ({
 												projects={projects}
 												getTeamWorkData={getTeamWorkData}
 												exceptionNameList={exceptionNameList}
+												propsSortingColumn={(selectedSegmentation === "performance") ? "completed_todo" : "tasks_count"}
 											/>
 										</Fragment>
 									))

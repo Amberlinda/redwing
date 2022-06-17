@@ -17,7 +17,7 @@ const TeamWorkSegmenting = ({selectedSegmentation, setSelectedSegmentation}) => 
             <ul className="segmentingListCont">
                 {options.map(elem => (
                     <li 
-                    style={elem == selectedSegmentation ? {fontWeight:"bold"} : {}}
+                    style={elem === selectedSegmentation ? {fontWeight:"bold"} : {}}
                     onClick={() => segmentHandler(elem)}>{elem}</li>
                 ))}
             </ul>

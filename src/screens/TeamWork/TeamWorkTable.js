@@ -9,7 +9,8 @@ const TeamWorkTable = ({
     getTeamWorkData,
     setLoading,
     exceptionNameList,
-    data
+    data,
+    propsSortingColumn
 }) => {
 
     const [users,setUsers] = useState([])
@@ -86,8 +87,11 @@ const TeamWorkTable = ({
         setUsers(userData)
     },[userData])
 
+    useEffect(() => {
+       setSortingColumn(propsSortingColumn)
+    },[propsSortingColumn])
 
-
+    
 
     return(
         <table cellspacing="0" cellpadding="0">
